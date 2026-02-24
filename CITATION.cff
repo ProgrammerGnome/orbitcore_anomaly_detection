@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use OrbitCore or its underlying concepts in your research, you are expected to cite it as below."
+authors:
+  - family-names: "Király"
+    given-names: "Márk"
+title: "OrbitCore: Dynamic Viewpoint- and Illumination-Invariant Anomaly Detection"
+version: 0.1.0
+date-released: 2026-02-24
+url: "https://github.com/ProgrammerGnome/orbitcore"
+license: "Apache-2.0"
+keywords:
+  - anomaly-detection
+  - computer-vision
+  - test-time-adaptation
+  - homography
+  - industrial-inspection
