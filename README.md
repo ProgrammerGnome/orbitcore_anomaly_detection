@@ -36,34 +36,34 @@ OrbitCore is not another fixed-camera production line algorithm. This engine was
 
 ### 📦 Example for usage:
 ```py
-        import torch
-        from anomalib.data import MVTecAD
-        from anomalib.engine import Engine
-        from orbitcore import OrbitCoreLightning
+import torch
+from anomalib.data import MVTecAD
+from anomalib.engine import Engine
+from orbitcore import OrbitCoreLightning
 
-        torch.manual_seed(42)
+torch.manual_seed(42)
 
-        datamodule = MVTecAD(
-            root="./datasets/MVTec",
-            category="transistor", 
-            train_batch_size=16,
-            eval_batch_size=4,
-        )
+datamodule = MVTecAD(
+    root="./datasets/MVTec",
+    category="transistor", 
+    train_batch_size=16,
+    eval_batch_size=4,
+)
 
-        engine_orbitcore = Engine(accelerator="gpu", devices=1, max_epochs=1)
+engine_orbitcore = Engine(accelerator="gpu", devices=1, max_epochs=1)
 
-        model_orbitcore = OrbitCoreLightning(
-                layers=["layer2", "layer3"], 
-                target_dim=128, 
-                coreset_sampling_ratio=0.01, 
-                use_srp=False, 
-                auto_optimize=False,
-                orbit_alpha=0.2 
-            )
+model_orbitcore = OrbitCoreLightning(
+        layers=["layer2", "layer3"], 
+        target_dim=128, 
+        coreset_sampling_ratio=0.01, 
+        use_srp=False, 
+        auto_optimize=False,
+        orbit_alpha=0.2 
+    )
 
-        engine_orbitcore.fit(datamodule=datamodule, model=model_orbitcore)
-        
-        engine_orbitcore.test(datamodule=datamodule, model=model_orbitcore, ckpt_path=None)
+engine_orbitcore.fit(datamodule=datamodule, model=model_orbitcore)
+
+engine_orbitcore.test(datamodule=datamodule, model=model_orbitcore, ckpt_path=None)
 ```
 
 ## 🛡️ License & Citation
