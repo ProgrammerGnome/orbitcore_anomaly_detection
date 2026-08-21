@@ -11,8 +11,8 @@ requires-python = ">=3.11.8"
 license = { text = "Apache License 2.0" }
 
 dependencies = [
-    "torch>=2.5.1+cu121",
-    "torchvision>=0.20.1+cu121",
+    "torch>=2.5.1",
+    "torchvision>=0.20.1",
     "anomalib>=2.2.0",
     "numpy>=2.2.6",
     "matplotlib>=3.10.7"
