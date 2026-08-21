@@ -99,13 +99,9 @@ class OrbitCoreModel(nn.Module):
         self.layers = layers
         
         resnet18_dims = {"layer1": 64, "layer2": 128, "layer3": 256, "layer4": 512}
-        
-        # --- KIKOMMENTELVE: Dinamikus fúziós dimenzió kalkuláció ---
+
         self.feature_dim = sum([resnet18_dims[l] for l in self.layers])
-        
-        # --- AKTÍV: Csak az utolsó megadott réteg dimenziója (memóriabiztos) ---
-        #self.feature_dim = resnet18_dims[self.layers[-1]]
-        
+
         self.backbone.eval()
         for param in self.backbone.parameters():
             param.requires_grad = False
@@ -171,8 +167,7 @@ class OrbitCoreModel(nn.Module):
                 features["layer4"] = f4
             
         extracted = [features[l] for l in self.layers]
-        
-        # --- KIKOMMENTELVE: Dinamikus rétegfúzió (Interpoláció és összefűzés) ---
+
         target_size = extracted[0].shape[2:]
         resized_features = []
         for f in extracted:
@@ -180,20 +175,14 @@ class OrbitCoreModel(nn.Module):
                 resized_features.append(F.interpolate(f, size=target_size, mode='bilinear', align_corners=False))
             else:
                 resized_features.append(f)
-        f_raw = torch.cat(resized_features, dim=1) 
-        
-        # --- AKTÍV: Kizárólag az utolsó réteget használjuk (nincs fúzió, kisebb rács) ---
-        #f_raw = extracted[-1] 
-        
+        f_raw = torch.cat(resized_features, dim=1)
+
         if self.use_srp:
             f_srp = torch.einsum('dc, bchw -> bdhw', self.srp_matrix.to(f_raw.device), f_raw)
         else:
-            f_srp = f_raw 
+            f_srp = f_raw
 
-        # ---> C MEGOLDÁS: FÉNYINVARIANCIA KŐKEMÉNY L2 NORMALIZÁCIÓVAL <---
-        # Minden pixelen a csatornavektort 1.0 hosszúságúra skálázzuk, elfojtva a fotometriai zajt.
         f_srp = F.normalize(f_srp, p=2, dim=1)
-        # -------------------------------------------------------------
         
         pad = self.kernel_size // 2
         mu = F.avg_pool2d(f_srp, self.kernel_size, stride=1, padding=pad)
@@ -234,11 +223,8 @@ class OrbitCoreModel(nn.Module):
             distances = torch.cdist(z_flat, mb, p=2.0)
             min_distances, _ = torch.min(distances, dim=1)
             
-            min_distances = torch.relu(min_distances - self.noise_floor)
-            
             anomaly_map_raw = min_distances.reshape(B, z.shape[2], z.shape[3])
-            
-            # Szelektív Edge Masking a peremtorzulások ellen
+
             mask = torch.ones_like(anomaly_map_raw)
             margin = 2 
             mask[:, :margin, :] = 0.0  
@@ -270,8 +256,7 @@ class OrbitCoreModel(nn.Module):
     def fit_coreset(self, features):
         sampler = KCenterGreedy(embedding=features, sampling_ratio=self.coreset_sampling_ratio)
         self.memory_bank = sampler.sample_coreset()
-        
-        # IPARI, MEMÓRIABIZTOS VERZIÓ
+
         with torch.no_grad():
             subset_size = min(10000, features.shape[0])
             subset_idx = torch.randperm(features.shape[0])[:subset_size]
@@ -282,102 +267,8 @@ class OrbitCoreModel(nn.Module):
             
             dists = torch.cdist(sub_features_gpu, mb_gpu)
             min_dists, _ = torch.min(dists, dim=1)
-            
-            # A skála csökkenése miatt (L2 normalizáció) a padlót is stabilizáljuk
+
             self.noise_floor = torch.quantile(min_dists, 0.99).cpu()
             
             del sub_features_gpu, mb_gpu, dists, min_dists
             torch.cuda.empty_cache()
-
-    def optimize_hyperparameters(self, train_loader, test_loader, pre_processor, device):
-        print("\n" + "="*60)
-        print(">>> BEÉPÍTETT GRID SEARCH MOTOR INDÍTÁSA <<<")
-        print("="*60)
-        
-        alphas = [0.0, 0.1, 0.2, 0.3, 0.4]
-        best_margin = -float('inf')
-        best_alpha = self.orbit_alpha
-        
-        clean_transform = v2.Compose([
-            v2.Resize((256, 256), antialias=True),
-            v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ])
-
-        for a in alphas:
-            print(f"\n[+] Memóriabank újraépítése Alpha = {a} értékkel...")
-            self.orbit_alpha = a
-            self.memory_bank = None
-            self.train() 
-            
-            embeddings = []
-            with torch.no_grad():
-                for batch in train_loader:
-                    img = batch.image.to(device)
-                    img = clean_transform(img)
-                    z = self.forward(img)
-                    embeddings.append(z.cpu())
-                    
-            embeddings_cat = torch.cat(embeddings, dim=0)
-            self.fit_coreset(embeddings_cat)
-            del embeddings, embeddings_cat
-            torch.cuda.empty_cache() 
-            
-            print(f"  [-] Döntési Margó (Margin) Tesztelése... (Zajkapu: {self.noise_floor.item():.4f})")
-            self.eval() 
-            
-            good_scores = []
-            defect_scores = []
-            
-            with torch.no_grad():
-                loaders = test_loader if isinstance(test_loader, list) else [test_loader]
-                for loader in loaders:
-                    for batch in loader:
-                        img = batch.image.to(device)
-                        labels = batch.gt_label
-                        
-                        if pre_processor is not None:
-                            img = pre_processor(img)
-                            
-                        scores, _ = self.forward(img)
-                        
-                        for i, lbl in enumerate(labels):
-                            if lbl == 0:
-                                good_scores.append(scores[i].item())
-                            else:
-                                defect_scores.append(scores[i].item())
-                                
-            if not good_scores or not defect_scores:
-                continue
-                
-            max_good = max(good_scores)
-            min_defect = min(defect_scores)
-            margin = min_defect - max_good
-            
-            print(f"      -> Max Good: {max_good:.4f} | Min Defect: {min_defect:.4f} | Margó: {margin:.4f}")
-            
-            if margin > best_margin:
-                best_margin = margin
-                best_alpha = a
-            
-            torch.cuda.empty_cache()
-                    
-        print("\n" + "="*60)
-        print(f">>> KÉSZ! Legjobb paraméter: Alpha={best_alpha} (Margó: {best_margin:.4f})")
-        print("="*60 + "\n")
-        
-        self.orbit_alpha = best_alpha
-        self.memory_bank = None
-        self.train()
-        embeddings = []
-        with torch.no_grad():
-            for batch in train_loader:
-                img = batch.image.to(device)
-                img = clean_transform(img)
-                z = self.forward(img)
-                embeddings.append(z.cpu())
-                
-        embeddings_cat = torch.cat(embeddings, dim=0)
-        self.fit_coreset(embeddings_cat)
-        del embeddings, embeddings_cat
-        torch.cuda.empty_cache()
-        self.eval()
