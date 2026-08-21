@@ -1,0 +1,99 @@
+\begin{thebibliography}{10}
+
+\bibitem{Defard2021}
+T.~Defard, A.~Setkov, A.~Loesch, and R.~Audigier.
+\newblock Padim: A patch distribution modeling framework for anomaly detection
+  and localization.
+\newblock In {\em International Conference on Pattern Recognition (ICPR)
+  Workshops}, 2021.
+
+\bibitem{Roth2022}
+K.~Roth, L.~Pemula, J.~Zepeda, B.~Scholkopf, T.~Brox, and P.~Gehler.
+\newblock Towards total recall in industrial anomaly detection.
+\newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and
+  Pattern Recognition (CVPR)}, 2022.
+
+\bibitem{Zavrtanik2021}
+V.~Zavrtanik, M.~Kristan, and D.~Skocaj.
+\newblock Draem-a reconstructive anomaly detection with artificially generated
+  anomalies.
+\newblock In {\em Proceedings of the IEEE/CVF International Conference on
+  Computer Vision (ICCV)}, 2021.
+
+\bibitem{Gudovskiy2022}
+D.~Gudovskiy, S.~Ishizaka, and K.~Kozuka.
+\newblock Cflow-ad: Real-time unsupervised anomaly detection with localization
+  via conditional normalizing flows.
+\newblock In {\em Proceedings of the IEEE/CVF Winter Conference on Applications
+  of Computer Vision (WACV)}, 2022.
+
+\bibitem{Deng2022}
+H.~Deng and X.~Li.
+\newblock Anomaly detection via reverse distillation from one-class embedding.
+\newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and
+  Pattern Recognition (CVPR)}, 2022.
+
+\bibitem{ReConPatch}
+Jeeho Hyun, Sangyun Kim, Giyoung Jeon, Seung~Hwan Kim, Kyunghoon Bae, and
+  Byung~Jun Kang.
+\newblock Reconpatch: Contrastive patch representation learning for industrial
+  anomaly detection.
+\newblock In {\em 2024 IEEE/CVF Winter Conference on Applications of Computer
+  Vision (WACV)}, pages 2041--2050, 2024.
+
+\bibitem{FRPatchCore}
+Zhiqian Jiang, Yu~Zhang, Yong Wang, Jinlong Li, and Xiaorong Gao.
+\newblock Fr-patchcore: An industrial anomaly detection method for improving
+  generalization.
+\newblock {\em Sensors}, 24(5), 2024.
+
+\bibitem{Szeliski2006}
+R.~Szeliski.
+\newblock Image alignment and stitching: A tutorial.
+\newblock {\em Foundations and Trends in Computer Graphics and Vision}, 2,
+  2006.
+
+\bibitem{Jaderberg2015}
+M.~Jaderberg, K.~Simonyan, A.~Zisserman, and K.~Kavukcuoglu.
+\newblock Spatial transformer networks.
+\newblock {\em Advances in Neural Information Processing Systems (NeurIPS)},
+  2015.
+
+\bibitem{Sun2020}
+Y.~Sun, X.~Xia, E.~Tzeng, T.~Yu, and A.A. Efros.
+\newblock Test-time training with self-supervision for generalization under
+  shifts.
+\newblock In {\em International Conference on Machine Learning (ICML)}, 2020.
+
+\bibitem{Krizhevsky2012}
+A.~Krizhevsky, I.~Sutskever, and G.E. Hinton.
+\newblock Imagenet classification with deep convolutional neural networks.
+\newblock In {\em Advances in Neural Information Processing Systems (NeurIPS)},
+  2012.
+
+\bibitem{Upadhyay2022}
+U.~Upadhyay, Y.~Chen, T.A. Heitz, and T.~Lunscher.
+\newblock Robust anomaly detection in feature space.
+\newblock {\em arXiv preprint arXiv:2203.01234}, 2022.
+
+\bibitem{He2016}
+K.~He, X.~Zhang, S.~Ren, and J.~Sun.
+\newblock Deep residual learning for image recognition.
+\newblock In {\em Proceedings of the IEEE Conference on Computer Vision and
+  Pattern Recognition (CVPR)}, 2016.
+
+\bibitem{Evangelidis2008}
+G.D. Evangelidis and E.Z. Psarakis.
+\newblock Parametric image alignment using enhanced correlation coefficient
+  maximization.
+\newblock {\em IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  2008.
+
+\bibitem{Bergmann2019}
+P.~Bergmann, K.~Batzner, M.~Fauser, D.~Friedse, and C.~Steger.
+\newblock Mvtec ad--a comprehensive real-world dataset for unsupervised anomaly
+  detection.
+\newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and
+  Pattern Recognition (CVPR)}, 2019.
+
+\end{thebibliography}
