@@ -18,13 +18,9 @@ OrbitCore is not another fixed-camera production line algorithm. This engine was
 
 * **Photometric Invariance:** Specular highlights and lighting variations mathematically manifest as an increase in the magnitude of feature vectors. The system eliminates this effect through the ruthless application of `F.normalize(f_srp, p=2, dim=1)`. L2 channel normalization scales each spatial location to unit length (1.0), severely suppressing intensity-derived global illumination variance. For distance computation, primarily the direction of the vector remains, encoding structural and texture information with high tolerance to color and shadow shifts.
 
-* **Dynamic Noise Floor:** The system eliminates static, human-defined thresholds. In the `fit_coreset` method, after building the memory bank, the model tests a random subset of the training data (up to 10,000 samples) against itself (`torch.cdist`). From the resulting distance distribution, it computes the `n%` quantile and designates it as the dynamic noise floor (`self.noise_floor`). During testing, the system subtracts this base noise from the measured distances (via `torch.relu`) and suppresses distortion artifacts occurring at the borders using a dedicated selective masking (`margin = 2`). As a result, only genuine, statistically significant deviations produce anomalies.
-
-* **Automatic Grid Search (Optional):** Built-in hyperparameter optimization engine. When activated, the system autonomously evaluates different Orbit tilt angles (`orbit_alpha`) during training and automatically fixes the parameter that guarantees the maximum decision margin (separability) between the scores of normal and defective samples.
-
 ## 🚀 Key Features
 
-* **Zero Defect Data for Deployment:** The core system is purely One-Class based. No prior knowledge or examples of potential defects are required to build the memory bank and deploy the model. (Note: Defective validation samples are only required if the optional Automatic Grid Search is utilized to maximize the decision margin).
+* **Zero Defect Data for Deployment:** The core system is purely One-Class based. No prior knowledge or examples of potential defects are required to build the memory bank and deploy the model.
 
 * **No Neural Network Training:** No backpropagation and no weight updates are performed. The system uses a pre-trained feature extractor architecture, eliminating the typical hardware and time bottlenecks associated with deep learning.
 
